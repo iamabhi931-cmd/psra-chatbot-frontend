@@ -1,0 +1,2141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>PSRA AI Chatbot — Understand PSRA. Get answers confidently.</title>
+
+  <!-- External font assets (Strictly Inter only) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- React 18 & ReactDOM for GooeyInputDemo component -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+  <script>
+    /* Pre-paint entrance state initialization */
+    (function() {
+      var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!prefersReduced) {
+        document.documentElement.classList.add('entrance', 'entrance-s2');
+      }
+      setTimeout(function() {
+        document.documentElement.classList.remove('entrance');
+      }, 3500);
+    })();
+  </script>
+
+  <style>
+    /* ══════════════════════════════════════════════════════════════════
+       RESET & GLOBAL FOUNDATIONS
+       ══════════════════════════════════════════════════════════════════ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+      background-color: #0c0c0c;
+      color: #ffffff;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+    }
+
+    body {
+      background-color: #0c0c0c;
+      color: #ffffff;
+      font-family: "Inter", "Helvetica Neue", Arial, system-ui, sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    body.menu-open {
+      overflow: hidden;
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       ENTRANCE OBSCURATION UTILITIES
+       ══════════════════════════════════════════════════════════════════ */
+    html.entrance [data-enter] {
+      opacity: 0;
+    }
+    html.entrance .hl-line {
+      opacity: 0;
+    }
+    html.entrance .hl-mask {
+      overflow: hidden;
+    }
+
+    html.entrance-s2 .section-two [data-enter] {
+      opacity: 0;
+    }
+    html.entrance-s2 .section-two .hl-line {
+      opacity: 0;
+    }
+    html.entrance-s2 .section-two .hl-mask {
+      overflow: hidden;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html.entrance [data-enter],
+      html.entrance-s2 .section-two [data-enter],
+      html.entrance .hl-line,
+      html.entrance-s2 .section-two .hl-line {
+        opacity: 1 !important;
+        transform: none !important;
+      }
+      html.entrance .hl-mask,
+      html.entrance-s2 .section-two .hl-mask {
+        overflow: visible !important;
+      }
+      * {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+      }
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       SECTION 1 — HERO
+       ══════════════════════════════════════════════════════════════════ */
+    .section-one {
+      min-height: 100dvh;
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      font-family: "Inter", "Helvetica Neue", Arial, system-ui, sans-serif;
+
+      --bg: #0c0c0c;
+      --box: #111111;
+      --hairline: rgba(255, 255, 255, 0.065);
+      --heading: #fafafa;
+      --subtitle: #9e9e9e;
+      --nav: #bcbcbc;
+      --placeholder: #aeaeae;
+      --chip-fill: rgba(255, 255, 255, 0.028);
+      --chip-border: rgba(255, 255, 255, 0.30);
+      --chip-edge: linear-gradient(135deg,
+        rgba(255, 255, 255, 1) 0%,
+        rgba(255, 255, 255, 0.94) 22%,
+        rgba(255, 255, 255, 0.44) 38%,
+        rgba(255, 255, 255, 0.28) 50%,
+        rgba(255, 255, 255, 0.11) 63%,
+        rgba(255, 255, 255, 0.04) 75%,
+        rgba(255, 255, 255, 0.02) 100%);
+      --icon: #e8e8e8;
+      --mic: #e1e1e1;
+      --strip: #5c5c5c;
+      --grad: linear-gradient(90deg,
+        rgba(255, 232, 120, 0) 0%, #ffe776 6%, #ffd400 26%, #ffd000 42%,
+        #c9c93c 60%, #86ca8a 74%, #78d0cd 88%, rgba(120, 208, 205, 0.55) 100%);
+      --grad-solid: linear-gradient(90deg,
+        #ffe776 0%, #ffd400 22%, #ffd000 40%, #c9c93c 60%, #86ca8a 76%, #78d0cd 100%);
+    }
+
+    .page {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: clamp(14px, 1.55vw, 26px) clamp(16px, 1.7vw, 28px) clamp(20px, 2.8vh, 36px);
+      width: 100%;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* –––– NAV TOPBAR –––– */
+    .nav-topbar {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      width: 100%;
+      position: relative;
+      z-index: 10;
+    }
+
+    .logo-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: #fff;
+      width: fit-content;
+    }
+
+    .logo-svg {
+      width: clamp(34px, 3.1vw, 52px);
+      height: clamp(34px, 3.1vw, 52px);
+      display: block;
+    }
+
+    .logo-brand-text {
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: #f5f5f5;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      list-style: none;
+      gap: clamp(1.6rem, 2.63vw, 2.75rem);
+    }
+
+    .nav-link {
+      color: var(--nav);
+      font-weight: 400;
+      font-size: clamp(1rem, 1.435vw, 1.5rem);
+      letter-spacing: 0.005em;
+      text-decoration: none;
+      transition: color 0.18s ease;
+      white-space: nowrap;
+    }
+
+    .nav-link:hover {
+      color: #f2f2f2;
+    }
+
+    .nav-cta-btn {
+      justify-self: end;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      color: #0c0c0c;
+      font-weight: 500;
+      font-size: clamp(0.88rem, 1.1vw, 1.05rem);
+      border-radius: 999px;
+      padding: clamp(0.55em, 0.9vw, 0.62em) clamp(1.1em, 2vw, 1.35em);
+      text-decoration: none;
+      transition: background 0.18s ease, transform 0.12s ease;
+      white-space: nowrap;
+    }
+
+    .nav-cta-btn:hover {
+      background: #ededed;
+    }
+
+    .nav-cta-btn:active {
+      transform: scale(0.98);
+    }
+
+    .burger-btn {
+      display: none;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      width: 42px;
+      height: 42px;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 5.5px;
+      z-index: 1001;
+      justify-self: end;
+    }
+
+    .burger-bar {
+      width: 22px;
+      height: 1.5px;
+      background-color: #f4f4f4;
+      border-radius: 2px;
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+      transform-origin: center;
+    }
+
+    .burger-btn[aria-expanded="true"] .burger-bar:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+    .burger-btn[aria-expanded="true"] .burger-bar:nth-child(2) {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+    .burger-btn[aria-expanded="true"] .burger-bar:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+
+    /* –––– HERO CENTER AREA –––– */
+    .hero-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      width: 100%;
+      margin: auto 0;
+      padding-top: clamp(18px, 3vh, 38px);
+      padding-bottom: clamp(18px, 3vh, 38px);
+    }
+
+    .hero-h1 {
+      font-weight: 500;
+      color: var(--heading);
+      line-height: 1.04;
+      letter-spacing: -0.021em;
+      font-size: clamp(2rem, 5.263vw, 5.5rem);
+      text-align: center;
+    }
+
+    @media (min-width: 1025px) {
+      .hero-h1 {
+        font-size: clamp(3.25rem, 4.6vw, 4.75rem);
+      }
+    }
+
+    .hl-mask {
+      display: block;
+      padding-bottom: 0.16em;
+      margin-bottom: -0.16em;
+      overflow: hidden;
+    }
+
+    .hl-line {
+      display: block;
+      will-change: transform, opacity;
+    }
+
+    .hero-subtitle {
+      color: var(--subtitle);
+      font-weight: 400;
+      font-size: clamp(0.95rem, 1.435vw, 1.5rem);
+      line-height: 1.3;
+      letter-spacing: 0.004em;
+      margin-top: clamp(1.1rem, 2.9vw, 3rem);
+      text-align: center;
+    }
+
+    /* –––– COMPOSER CARD –––– */
+    .composer-shell {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      isolation: isolate;
+      transform: translate3d(0, 0, 0);
+    }
+
+    .composer {
+      position: relative;
+      width: clamp(300px, 55vw, 913px);
+      margin-top: clamp(1.2rem, 2.9vw, 3.05rem);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.028), rgba(255, 255, 255, 0) 42%), #111111;
+      border: 1px solid rgba(255, 255, 255, 0.065);
+      border-radius: clamp(14px, 1.32vw, 22px);
+      box-shadow: 0 2px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      padding: clamp(16px, 1.9vw, 32px);
+      min-height: clamp(150px, 17.2vw, 288px);
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+
+    @media (min-width: 1025px) {
+      .composer {
+        width: clamp(560px, 52vw, 820px);
+        min-height: clamp(170px, 15vw, 250px);
+      }
+    }
+
+    @media (max-width: 1024px) and (min-width: 681px) {
+      .composer {
+        width: clamp(320px, 72vw, 760px);
+      }
+    }
+
+    @media (max-width: 680px) {
+      .composer {
+        width: 100%;
+      }
+    }
+
+    .composer-glow {
+      position: absolute;
+      z-index: -1;
+      pointer-events: none;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: calc(-1 * clamp(3px, 0.35vw, 6px));
+      border-radius: inherit;
+      background: var(--grad-solid);
+      filter: blur(0.4px);
+      opacity: 0.95;
+    }
+
+    .composer-placeholder {
+      color: var(--placeholder);
+      font-size: clamp(0.95rem, 1.435vw, 1.5rem);
+      line-height: 1.4;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .composer-controls {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      gap: clamp(8px, 1.08vw, 18px);
+      width: 100%;
+      padding-top: 14px;
+    }
+
+    /* Masked 1px gradient ring button base */
+    .chip-btn {
+      position: relative;
+      background: var(--chip-fill);
+      border: 1px solid var(--chip-border);
+      color: #ffffff;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.18s ease;
+      font-family: inherit;
+    }
+
+    .chip-btn:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    @supports ((-webkit-mask-composite: xor) or (mask-composite: exclude)) {
+      .chip-btn {
+        border-color: transparent;
+      }
+      .chip-btn::before {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        border-radius: inherit;
+        padding: 1px;
+        background: var(--chip-edge);
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        mask-composite: exclude;
+        pointer-events: none;
+      }
+    }
+
+    .chip-round {
+      width: clamp(38px, 3.23vw, 54px);
+      height: clamp(38px, 3.23vw, 54px);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .chip-pill {
+      height: clamp(38px, 3.23vw, 54px);
+      border-radius: 999px;
+      padding: 0 clamp(12px, 1.4vw, 23px);
+      font-size: clamp(0.9rem, 1.316vw, 1.375rem);
+      font-weight: 500;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .composer-spacer {
+      flex: 1;
+    }
+
+    .mic-btn {
+      background: transparent;
+      border: none;
+      color: var(--mic);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      border-radius: 50%;
+      transition: opacity 0.18s ease;
+      flex-shrink: 0;
+    }
+
+    .mic-btn:hover {
+      opacity: 0.8;
+    }
+
+    .send-btn {
+      --send-ring: clamp(1.1px, 0.092vw, 1.53px);
+      width: clamp(40px, 3.35vw, 56px);
+      height: clamp(40px, 3.35vw, 56px);
+      border-radius: 50%;
+      position: relative;
+      padding: var(--send-ring);
+      background: var(--grad-solid);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: filter 0.18s ease, transform 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .send-btn::before {
+      content: "";
+      position: absolute;
+      inset: -50%;
+      border-radius: 50%;
+      background: var(--grad-solid);
+      pointer-events: none;
+      transform-origin: center center;
+    }
+
+    html.hero-ready .send-btn::before {
+      animation: send-ring-sweep 10s linear infinite;
+    }
+
+    @keyframes send-ring-sweep {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html.hero-ready .send-btn::before {
+        animation: none;
+      }
+    }
+
+    .send-btn:hover {
+      filter: brightness(1.08);
+    }
+
+    .send-btn:active {
+      transform: scale(0.95);
+    }
+
+    .send-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: #141414;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .send-inner svg {
+      width: 44%;
+      height: 44%;
+      stroke: #fafafa;
+    }
+
+    /* –––– TRUST LOGOS FOOTER –––– */
+    .trust-logos {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(1.6rem, 5.6vw, 5.9rem);
+      color: var(--strip);
+      width: 100%;
+      margin-top: clamp(1.8rem, 3.5vw, 3.8rem);
+      padding-bottom: clamp(6px, 1vh, 14px);
+    }
+
+    .trust-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: clamp(0.9rem, 1.2vw, 1.15rem);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      color: var(--strip);
+      opacity: 0.9;
+      user-select: none;
+    }
+
+    .trust-brand svg {
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+
+    .trust-brand sup {
+      font-size: 0.6em;
+      vertical-align: super;
+      margin-left: 1px;
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       MOBILE NAV OVERLAY (≤1024)
+       ══════════════════════════════════════════════════════════════════ */
+    .nav-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: clamp(20px, 3vh, 32px) clamp(20px, 4vw, 36px) clamp(24px, 4vh, 40px);
+      background: 
+        radial-gradient(ellipse at 15% 20%, rgba(255, 212, 0, 0.08) 0%, transparent 60%),
+        radial-gradient(ellipse at 85% 80%, rgba(120, 208, 205, 0.08) 0%, transparent 60%),
+        rgba(12, 12, 12, 0.95);
+      backdrop-filter: blur(22px) saturate(120%);
+      -webkit-backdrop-filter: blur(22px) saturate(120%);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.34s ease, visibility 0.34s ease;
+    }
+
+    .nav-overlay.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .overlay-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    .overlay-nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: clamp(16px, 3.2vh, 32px);
+      margin-top: auto;
+      margin-bottom: auto;
+    }
+
+    .overlay-link {
+      display: inline-block;
+      color: #ffffff;
+      text-decoration: none;
+      font-size: clamp(2rem, 9vw, 3.4rem);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      position: relative;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1), color 0.18s ease;
+      width: fit-content;
+    }
+
+    .nav-overlay.open .overlay-link:nth-child(1) {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: 0.08s;
+    }
+    .nav-overlay.open .overlay-link:nth-child(2) {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: 0.14s;
+    }
+    .nav-overlay.open .overlay-link:nth-child(3) {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: 0.20s;
+    }
+    .nav-overlay.open .overlay-link:nth-child(4) {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: 0.26s;
+    }
+
+    .overlay-link::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -4px;
+      width: 0;
+      height: 2px;
+      background: var(--grad);
+      transition: width 0.25s ease;
+    }
+
+    .overlay-link:hover::after {
+      width: 100%;
+    }
+
+    .overlay-footer {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .overlay-grad-bar {
+      width: 100%;
+      height: 2px;
+      background: var(--grad-solid);
+    }
+
+    .overlay-cta-btn {
+      width: 100%;
+      text-align: center;
+      background: #ffffff;
+      color: #0c0c0c;
+      font-weight: 500;
+      font-size: 1.1rem;
+      border-radius: 999px;
+      padding: 14px 24px;
+      text-decoration: none;
+      transition: background 0.18s ease;
+      display: block;
+    }
+
+    .overlay-cta-btn:hover {
+      background: #ededed;
+    }
+
+    .overlay-cta-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       SECTION 2 — FEATURES
+       ══════════════════════════════════════════════════════════════════ */
+    .section-two {
+      min-height: 100dvh;
+      background: #0c0c0c;
+      position: relative;
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+      padding: clamp(20px, 3.2vh, 42px) clamp(16px, 6vw, 91px) clamp(16px, 2.4vh, 32px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      --heading: #ffffff;
+      --subhead: #8b8b8d;
+      --panel-bg: #0d0d0d;
+      --bubble-bg: #1c1c1c;
+      --msg-text: #efefef;
+      --reason-text: #0b0c07;
+      --green: #23d92c;
+      --input-bg: #fdfdfd;
+      --placeholder: #6b6b6d;
+      --send-bg: #0c0c0c;
+    }
+
+    @media (min-width: 1025px) {
+      .section-two {
+        padding-top: clamp(130px, 12.6vw, 210px);
+      }
+    }
+
+    .section-two-wrap {
+      max-width: 1300px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .features-h2 {
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      font-size: clamp(1.6rem, 4.1vw, 3.3rem);
+      line-height: 1.11;
+      text-align: center;
+      color: var(--heading);
+    }
+
+    .features-subhead {
+      color: var(--subhead);
+      font-size: clamp(0.82rem, 1.25vw, 1.125rem);
+      text-align: center;
+      margin-top: clamp(12px, 1.6vh, 22px);
+      line-height: 1.45;
+    }
+
+    /* GRADIENT PANEL */
+    .panel {
+      width: 100%;
+      max-width: 890px;
+      margin-top: clamp(22px, 3.6vh, 38px);
+      border-radius: clamp(10px, 1vw, 14px);
+      position: relative;
+      overflow: hidden;
+      padding: clamp(14px, 1.8vw, 22px);
+      background:
+        radial-gradient(120% 150% at 9% 52%, #d2ae1a 0%, #bf9f28 22%, rgba(175, 155, 55, 0) 56%),
+        radial-gradient(120% 150% at 95% 50%, #64a3a2 0%, #4d9494 34%, rgba(70, 140, 140, 0) 64%),
+        radial-gradient(80% 110% at 42% 6%, rgba(150, 160, 55, 0.55) 0%, rgba(150, 160, 60, 0) 42%),
+        linear-gradient(96deg, #c6a119 0%, #b0972a 32%, #7ba184 62%, #509393 100%);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .panel::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      background: radial-gradient(135% 120% at 50% 50%, transparent 58%, rgba(0, 0, 0, 0.30) 100%);
+    }
+
+    .reasoning-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: clamp(10px, 1.3vh, 16px);
+      position: relative;
+      z-index: 2;
+    }
+
+    .reasoning-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px rgba(45, 220, 55, 0.65);
+    }
+
+    .reasoning-label {
+      color: var(--reason-text);
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    /* CHAT CARD */
+    .chat-card {
+      max-width: 814px;
+      width: 100%;
+      margin: 0 auto;
+      background: var(--panel-bg);
+      border-radius: clamp(12px, 1.4vw, 18px);
+      padding: clamp(16px, 2vw, 24px);
+      position: relative;
+      z-index: 2;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.35);
+      display: flex;
+      flex-direction: column;
+      gap: clamp(10px, 1.4vh, 16px);
+    }
+
+    .chat-msg {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .chat-msg.user {
+      justify-content: flex-end;
+    }
+
+    .chat-msg.ai {
+      justify-content: flex-start;
+    }
+
+    .avatar-user {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #232323;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      order: 2;
+    }
+
+    .avatar-user svg {
+      width: 16px;
+      height: 16px;
+      stroke: #f2f2f2;
+    }
+
+    .avatar-ai {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(105deg, #f5c40a 0%, #dcae3f 40%, #6ac6a0 62%, #22c0cf 100%);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 10px rgba(245, 196, 10, 0.25);
+    }
+
+    .chat-bubble {
+      background: var(--bubble-bg);
+      color: var(--msg-text);
+      border-radius: clamp(11px, 1.1vw, 15px);
+      max-width: 78%;
+      padding: clamp(8px, 1.1vh, 12px) clamp(12px, 1.4vw, 16px);
+      font-size: clamp(0.8rem, 1.12vw, 1.06rem);
+      line-height: 1.42;
+      word-break: break-word;
+    }
+
+    .chat-msg.user .chat-bubble {
+      order: 1;
+      background: #1e1e1e;
+    }
+
+    /* CHAT INPUT BAR */
+    .chat-input-bar {
+      height: clamp(40px, 4.4vh, 48px);
+      background: var(--input-bg);
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      padding: 0 6px 0 16px;
+      margin-top: clamp(6px, 1vh, 12px);
+      position: relative;
+      z-index: 2;
+      gap: 8px;
+    }
+
+    .chat-input-placeholder {
+      color: var(--placeholder);
+      font-size: clamp(0.8rem, 1.05vw, 0.95rem);
+      flex: 1;
+      user-select: none;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .chat-input-mic {
+      background: transparent;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      cursor: pointer;
+    }
+
+    .chat-input-mic svg {
+      fill: #111111;
+      width: 17px;
+      height: 17px;
+    }
+
+    .chat-input-send {
+      width: clamp(28px, 3vh, 34px);
+      height: clamp(28px, 3vh, 34px);
+      border-radius: 50%;
+      background: var(--send-bg);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .chat-input-send svg {
+      stroke: #ffffff;
+      width: 15px;
+      height: 15px;
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       GOOEY INPUT DEMO (REACT UI COMPONENT)
+       ══════════════════════════════════════════════════════════════════ */
+    .gooey-demo-wrap {
+      width: 100%;
+      max-width: 890px;
+      margin-top: clamp(24px, 3.6vh, 40px);
+      position: relative;
+      z-index: 2;
+    }
+
+    .gooey-demo-card {
+      width: 100%;
+      background: #0d0d0d;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: clamp(12px, 1.4vw, 18px);
+      padding: clamp(16px, 2vw, 24px);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.35);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .gooey-demo-header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .gooey-demo-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #8b8b8d;
+    }
+
+    .gooey-demo-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #4d9494;
+      box-shadow: 0 0 6px rgba(77, 148, 148, 0.8);
+    }
+
+    .gooey-demo-caption {
+      font-size: 0.78rem;
+      color: #6b6b6d;
+    }
+
+    /* Tailwind utility mappings for GooeyInputDemo */
+    .flex { display: flex; }
+    .h-40 { height: 10rem; }
+    .w-full { width: 100%; }
+    .items-center { align-items: center; }
+    .justify-center { justify-content: center; }
+    .relative { position: relative; }
+    .absolute { position: absolute; }
+    .hidden { display: none; }
+    .h-0 { height: 0; }
+    .w-0 { width: 0; }
+    .h-10 { height: 2.5rem; }
+    .size-10 { width: 2.5rem; height: 2.5rem; }
+    .size-4 { width: 1rem; height: 1rem; }
+    .shrink-0 { flex-shrink: 0; }
+    .top-1\/2 { top: 50%; }
+    .left-0 { left: 0; }
+    .-translate-y-1\/2 { transform: translateY(-50%); }
+    .cursor-pointer { cursor: pointer; }
+    .gap-2 { gap: 0.5rem; }
+    .rounded-full { border-radius: 9999px; }
+    .px-4 { padding-left: 1rem; padding-right: 1rem; }
+    .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+    .font-medium { font-weight: 500; }
+    .outline-none { outline: 2px solid transparent; outline-offset: 2px; }
+    .min-w-0 { min-width: 0; }
+    .flex-1 { flex: 1 1 0%; }
+    .bg-transparent { background-color: transparent; }
+
+    /* Surface styling for Gooey pill elements */
+    .bg-foreground {
+      background-color: #ffffff;
+    }
+    .text-background {
+      color: #0c0c0c;
+    }
+    .shadow-sm {
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+    .ring-1 {
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15), 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .gooey-button-row {
+      display: flex;
+      height: 2.5rem;
+      align-items: center;
+      justify-content: center;
+      transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), margin-left 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .gooey-bubble-anim {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%) scale(0);
+      opacity: 0;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+      pointer-events: none;
+    }
+    .gooey-bubble-anim.is-expanded {
+      transform: translateY(-50%) scale(1);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .gooey-input-el {
+      font-family: inherit;
+      border: none;
+      outline: none;
+    }
+    .gooey-input-el::placeholder {
+      color: rgba(12, 12, 12, 0.55);
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       RESPONSIVE BREAKPOINTS
+       ══════════════════════════════════════════════════════════════════ */
+    @media (max-width: 1024px) {
+      .nav-topbar {
+        display: flex;
+        justify-content: space-between;
+      }
+      .nav-links, .nav-cta-btn {
+        display: none;
+      }
+      .burger-btn {
+        display: flex;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .hero-subtitle br {
+        display: none;
+      }
+      .hero-subtitle {
+        width: min(100%, 22rem);
+      }
+      .chip-round, .chip-pill, .send-btn {
+        height: 44px;
+        min-height: 44px;
+      }
+      .chip-round, .send-btn {
+        width: 44px;
+        min-width: 44px;
+      }
+      .composer {
+        min-height: 150px;
+        padding: 16px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .trust-logos {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.4rem 2rem;
+        justify-items: center;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .chip-pill {
+        padding: 0 10px;
+        font-size: 0.85rem;
+      }
+      .composer-controls {
+        gap: 6px;
+      }
+    }
+
+    @media (max-height: 520px) {
+      .features-subhead {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       SECTION 1 — HERO
+       ══════════════════════════════════════════════════════════════════ -->
+  <section class="section-one" id="home">
+    <div class="page">
+
+      <!-- TOP NAV -->
+      <nav class="nav-topbar" aria-label="Main Navigation">
+        <!-- LEFT: LOGO LINK -->
+        <a href="#home" class="logo-link" aria-label="Home" data-enter id="heroLogo">
+          <svg class="logo-svg" viewBox="0 0 52 52" width="52" height="52" aria-hidden="true">
+            <g class="rays" stroke="#f4f4f4" stroke-width="1.4" stroke-linecap="round"></g>
+            <circle cx="26" cy="26" r="7.4" fill="#fbfbfb"></circle>
+          </svg>
+          <span class="logo-brand-text">PSRA AI</span>
+        </a>
+
+        <!-- CENTER: NAV LINKS -->
+        <ul class="nav-links" id="desktopNavLinks">
+          <li><a href="#features" class="nav-link" data-enter>Features</a></li>
+          <li><a href="#features" class="nav-link" data-enter>Data Flow</a></li>
+          <li><a href="#features" class="nav-link" data-enter>Scoring</a></li>
+          <li><a href="#features" class="nav-link" data-enter>FAQ</a></li>
+        </ul>
+
+        <!-- RIGHT: CTA BUTTON -->
+        <a href="#features" class="nav-cta-btn" data-enter id="heroCta">Explore Assistant</a>
+
+        <!-- MOBILE BURGER BUTTON (≤1024) -->
+        <button class="burger-btn" id="burgerToggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="navOverlay" data-enter>
+          <span class="burger-bar"></span>
+          <span class="burger-bar"></span>
+          <span class="burger-bar"></span>
+        </button>
+      </nav>
+
+      <!-- HERO CENTER COPY & COMPOSER -->
+      <div class="hero-center">
+        <h1 class="hero-h1">
+          <span class="hl-mask"><span class="hl-line">Understand PSRA.</span></span>
+          <span class="hl-mask"><span class="hl-line">Get answers confidently.</span></span>
+        </h1>
+
+        <p class="hero-subtitle" data-enter id="heroSubtitle">
+          An AI assistant for PSRA data flows,<br>GIID mappings, milestones, and SRS metrics.
+        </p>
+
+        <!-- COMPOSER SHELL & CARD -->
+        <div class="composer-shell" data-enter id="composerShell">
+          <div class="composer">
+            <div class="composer-glow" id="composerGlow"></div>
+
+            <div class="composer-placeholder" data-enter id="composerPlaceholder">
+              Ask anything about PSRA data, milestones, or SRS…
+            </div>
+
+            <div class="composer-controls" id="composerControls">
+              <!-- ATTACHMENT CHIP BUTTON -->
+              <button class="chip-btn chip-round" aria-label="Add attachment" data-enter id="ctrlAttach">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="#ffffff" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+              </button>
+
+              <!-- PSRA KNOWLEDGE PILL CHIP -->
+              <button class="chip-btn chip-pill" aria-label="PSRA Knowledge mode" data-enter id="ctrlPill">
+                <svg viewBox="0 0 24 24" width="17" height="17" stroke="#ffffff" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 18h6"></path>
+                  <path d="M10 22h4"></path>
+                  <path d="M12 2a7 7 0 0 0-7 7c0 2.6 1.4 4.8 3.5 6h7c2.1-1.2 3.5-3.4 3.5-6a7 7 0 0 0-7-7z"></path>
+                </svg>
+                <span>PSRA Knowledge</span>
+              </button>
+
+              <div class="composer-spacer"></div>
+
+              <!-- MIC BUTTON -->
+              <button class="mic-btn" aria-label="Voice input" data-enter id="ctrlMic">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="#e1e1e1" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                  <line x1="12" y1="19" x2="12" y2="23"></line>
+                  <line x1="8" y1="23" x2="16" y2="23"></line>
+                </svg>
+              </button>
+
+              <!-- SEND BUTTON (Continuous Ambient Gradient Ring Sweep) -->
+              <button class="send-btn" aria-label="Send query" data-enter id="ctrlSend">
+                <span class="send-inner">
+                  <svg viewBox="0 0 24 24" width="18" height="18" stroke="#fafafa" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="19" x2="12" y2="5"></line>
+                    <polyline points="5 12 12 5 19 12"></polyline>
+                  </svg>
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRUST LOGOS FOOTER -->
+      <footer class="trust-logos" aria-label="Trusted by teams">
+        <!-- BRAND 1 -->
+        <div class="trust-brand" data-enter>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+          </svg>
+          <span>logoipsum</span>
+        </div>
+
+        <!-- BRAND 2 -->
+        <div class="trust-brand" data-enter>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"></circle>
+            <circle cx="12" cy="12" r="3" fill="currentColor"></circle>
+          </svg>
+          <span>logoipsum<sup>&reg;</sup></span>
+        </div>
+
+        <!-- BRAND 3 -->
+        <div class="trust-brand" data-enter>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" fill="none"></rect>
+            <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" fill="none"></rect>
+            <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" fill="none"></rect>
+            <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" fill="none"></rect>
+          </svg>
+          <span>logoipsum</span>
+        </div>
+
+        <!-- BRAND 4 -->
+        <div class="trust-brand" data-enter>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5" stroke="currentColor" stroke-width="2" fill="none"></polygon>
+            <polygon points="12 6 18 10 18 14 12 18 6 14 6 10" fill="currentColor"></polygon>
+          </svg>
+          <span>logoipsum</span>
+        </div>
+      </footer>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       MOBILE NAV OVERLAY DIALOG (≤1024)
+       ══════════════════════════════════════════════════════════════════ -->
+  <div class="nav-overlay" id="navOverlay" role="dialog" aria-modal="true" aria-label="Navigation Menu">
+    <div class="overlay-header">
+      <a href="#home" class="logo-link overlay-logo" aria-label="Home">
+        <svg class="logo-svg" viewBox="0 0 52 52" width="42" height="42" aria-hidden="true">
+          <g class="rays overlay-rays" stroke="#f4f4f4" stroke-width="1.4" stroke-linecap="round"></g>
+          <circle cx="26" cy="26" r="7.4" fill="#fbfbfb"></circle>
+        </svg>
+        <span class="logo-brand-text">PSRA AI</span>
+      </a>
+      <button class="burger-btn" id="overlayCloseBtn" aria-label="Close navigation menu" aria-expanded="true">
+        <span class="burger-bar" style="transform: translateY(7px) rotate(45deg);"></span>
+        <span class="burger-bar" style="opacity: 0; transform: scaleX(0);"></span>
+        <span class="burger-bar" style="transform: translateY(-7px) rotate(-45deg);"></span>
+      </button>
+    </div>
+
+    <ul class="overlay-nav-list">
+      <li><a href="#features" class="overlay-link">Features</a></li>
+      <li><a href="#features" class="overlay-link">Data Flow</a></li>
+      <li><a href="#features" class="overlay-link">Scoring</a></li>
+      <li><a href="#features" class="overlay-link">FAQ</a></li>
+    </ul>
+
+    <div class="overlay-footer">
+      <div class="overlay-grad-bar"></div>
+      <a href="#features" class="overlay-cta-btn">Explore Assistant</a>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       SECTION 2 — FEATURES
+       ══════════════════════════════════════════════════════════════════ -->
+  <section class="section-two" id="features">
+    <div class="section-two-wrap">
+
+      <!-- SECTION 2 HEADINGS -->
+      <h2 class="features-h2">
+        <span class="hl-mask"><span class="hl-line">Built for PSRA understanding.</span></span>
+        <span class="hl-mask"><span class="hl-line">Powered by trusted documentation.</span></span>
+      </h2>
+
+      <p class="features-subhead" data-enter id="featuresSubhead">
+        Explore data pipelines, GIID mappings, and scoring logic.<br>
+        Get structured answers grounded in approved PSRA sources.
+      </p>
+
+      <!-- GRADIENT PANEL -->
+      <div class="panel" data-enter id="featuresPanel">
+
+        <!-- LIVE REASONING STATUS -->
+        <div class="reasoning-row" data-enter id="reasoningRow">
+          <div class="reasoning-dot"></div>
+          <span class="reasoning-label">Live reasoning</span>
+        </div>
+
+        <!-- CHAT CARD WITH STATIC DEMONSTRATION -->
+        <div class="chat-card" id="chatCard">
+
+          <!-- 1. USER MSG -->
+          <div class="chat-msg user" data-enter>
+            <div class="chat-bubble">
+              How does the PSRA data pipeline work?
+            </div>
+            <div class="avatar-user" aria-label="User avatar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#f2f2f2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+          </div>
+
+          <!-- 2. AI MSG -->
+          <div class="chat-msg ai" data-enter>
+            <div class="avatar-ai" aria-label="AI avatar"></div>
+            <div class="chat-bubble">
+              The current pipeline combines the frozen historical Base24 dataset with fresh Karthi Jira data for non-Base24 programs. The combined LIVE table feeds downstream milestone processing and reporting.
+            </div>
+          </div>
+
+          <!-- 3. USER MSG -->
+          <div class="chat-msg user" data-enter>
+            <div class="chat-bubble">
+              What is a GIID?
+            </div>
+            <div class="avatar-user" aria-label="User avatar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#f2f2f2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+          </div>
+
+          <!-- 4. AI MSG -->
+          <div class="chat-msg ai" data-enter>
+            <div class="avatar-ai" aria-label="AI avatar"></div>
+            <div class="chat-bubble">
+              A GIID identifies the program grouping used by PSRA reporting. The psra_giid_info mapping associates Jira Vehicle Program names with their corresponding GIIDs.
+            </div>
+          </div>
+
+          <!-- 5. USER MSG -->
+          <div class="chat-msg user" data-enter>
+            <div class="chat-bubble">
+              How is the final SRS score calculated?
+            </div>
+            <div class="avatar-user" aria-label="User avatar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#f2f2f2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+          </div>
+
+          <!-- 6. AI MSG -->
+          <div class="chat-msg ai" data-enter>
+            <div class="avatar-ai" aria-label="AI avatar"></div>
+            <div class="chat-bubble">
+              The final SRS combines HPR, ITS, WART, MIS, and MRR using the documented component weights:<br><br>
+              <strong>SRS = (HPR &times; 40%) + (WART &times; 25%) + (MIS &times; 15%) + (ITS &times; 10%) + (MRR &times; 10%)</strong><br><br>
+              Component weights: HPR 40%, ITS 10%, WART 25%, MIS 15%, and MRR 10%.
+            </div>
+          </div>
+
+          <!-- WHITE PILL INPUT BAR -->
+          <div class="chat-input-bar" data-enter id="chatInputBar">
+            <span class="chat-input-placeholder">Ask anything about PSRA data, milestones, or SRS…</span>
+            <button class="chat-input-mic" aria-label="Voice search">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"></path>
+                <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"></path>
+              </svg>
+            </button>
+            <button class="chat-input-send" aria-label="Send message">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="19" x2="12" y2="5"></line>
+                <polyline points="5 12 12 5 19 12"></polyline>
+              </svg>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- INTERACTIVE GOOEY INPUT DEMO (React Component) -->
+      <div class="gooey-demo-wrap" data-enter id="gooeyDemoWrap">
+        <div class="gooey-demo-card">
+          <div class="gooey-demo-header">
+            <div class="gooey-demo-pill">
+              <span class="gooey-demo-dot"></span>
+              <span>GooeyInputDemo Component</span>
+            </div>
+            <span class="gooey-demo-caption">Click to expand liquid search</span>
+          </div>
+          <div id="gooey-input-demo-root" class="w-full"></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       CLIENT LOGIC & WAAPI ANIMATION CHOREOGRAPHY
+       ══════════════════════════════════════════════════════════════════ -->
+  <script>
+    (function() {
+      'use strict';
+
+      /* 1. Generate runtime Logo rays (24 radial lines) */
+      function renderLogoRays(selector) {
+        var rayGroups = document.querySelectorAll(selector);
+        var cx = 26, cy = 26;
+        var rInner = 10.4, rOuter = 22.6;
+        var numRays = 24;
+
+        rayGroups.forEach(function(group) {
+          group.innerHTML = '';
+          for (var i = 0; i < numRays; i++) {
+            var angle = -Math.PI / 2 + (i * 2 * Math.PI / numRays);
+            var x1 = cx + rInner * Math.cos(angle);
+            var y1 = cy + rInner * Math.sin(angle);
+            var x2 = cx + rOuter * Math.cos(angle);
+            var y2 = cy + rOuter * Math.sin(angle);
+
+            var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', x1.toFixed(2));
+            line.setAttribute('y1', y1.toFixed(2));
+            line.setAttribute('x2', x2.toFixed(2));
+            line.setAttribute('y2', y2.toFixed(2));
+            group.appendChild(line);
+          }
+        });
+      }
+
+      renderLogoRays('.rays');
+
+      /* 2. Mobile Menu Navigation */
+      var burgerToggle = document.getElementById('burgerToggle');
+      var navOverlay = document.getElementById('navOverlay');
+      var overlayCloseBtn = document.getElementById('overlayCloseBtn');
+      var overlayLinks = document.querySelectorAll('.overlay-link, .overlay-cta-btn');
+
+      function openMenu() {
+        burgerToggle.setAttribute('aria-expanded', 'true');
+        navOverlay.classList.add('open');
+        document.body.classList.add('menu-open');
+      }
+
+      function closeMenu() {
+        burgerToggle.setAttribute('aria-expanded', 'false');
+        navOverlay.classList.remove('open');
+        document.body.classList.remove('menu-open');
+      }
+
+      if (burgerToggle) {
+        burgerToggle.addEventListener('click', function() {
+          var isOpen = navOverlay.classList.contains('open');
+          if (isOpen) {
+            closeMenu();
+          } else {
+            openMenu();
+          }
+        });
+      }
+
+      if (overlayCloseBtn) {
+        overlayCloseBtn.addEventListener('click', closeMenu);
+      }
+
+      overlayLinks.forEach(function(link) {
+        link.addEventListener('click', closeMenu);
+      });
+
+      window.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && navOverlay.classList.contains('open')) {
+          closeMenu();
+        }
+      });
+
+      window.addEventListener('resize', function() {
+        if (window.innerWidth > 1024 && navOverlay.classList.contains('open')) {
+          closeMenu();
+        }
+      });
+
+      /* 3. Animation choreography with WAAPI */
+      var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReducedMotion) {
+        document.documentElement.classList.remove('entrance', 'entrance-s2');
+        document.documentElement.classList.add('hero-ready');
+        return;
+      }
+
+      var REVEAL = 'cubic-bezier(0.16, 1, 0.3, 1)';
+      var LIFT   = 'cubic-bezier(0.22, 1, 0.36, 1)';
+      var isMobile = window.innerWidth <= 680;
+      var D = isMobile ? 0.7 : 1.0;
+
+      var s1Animations = [];
+
+      function startSection1Timeline() {
+        var logoEl = document.getElementById('heroLogo');
+        var navLinkEls = document.querySelectorAll('#desktopNavLinks .nav-link');
+        var burgerEl = document.getElementById('burgerToggle');
+        var ctaEl = document.getElementById('heroCta');
+        var h1Lines = document.querySelectorAll('.section-one .hl-line');
+        var subtitleEl = document.getElementById('heroSubtitle');
+        var composerShell = document.getElementById('composerShell');
+        var composerPlaceholder = document.getElementById('composerPlaceholder');
+        var ctrlButtons = [
+          document.getElementById('ctrlAttach'),
+          document.getElementById('ctrlPill'),
+          document.getElementById('ctrlMic'),
+          document.getElementById('ctrlSend')
+        ];
+        var composerGlow = document.getElementById('composerGlow');
+        var trustBrands = document.querySelectorAll('.trust-brand');
+
+        // 0.00 logo: opacity 0→1, scale 0.92→1, dur 0.60s, LIFT
+        if (logoEl) {
+          s1Animations.push(logoEl.animate([
+            { opacity: 0, transform: 'scale(0.92)' },
+            { opacity: 1, transform: 'scale(1)' }
+          ], { duration: 600, delay: 0, easing: LIFT, fill: 'forwards' }));
+        }
+
+        // 0.10 nav links: lift 10px, dur 0.50, stagger +0.05 each
+        navLinkEls.forEach(function(link, idx) {
+          s1Animations.push(link.animate([
+            { opacity: 0, transform: 'translateY(' + (10 * D) + 'px)' },
+            { opacity: 1, transform: 'translateY(0)' }
+          ], { duration: 500, delay: 100 + (idx * 50), easing: LIFT, fill: 'forwards' }));
+        });
+
+        // 0.16 burger: lift 10px
+        if (burgerEl) {
+          s1Animations.push(burgerEl.animate([
+            { opacity: 0, transform: 'translateY(' + (10 * D) + 'px)' },
+            { opacity: 1, transform: 'translateY(0)' }
+          ], { duration: 500, delay: 160, easing: LIFT, fill: 'forwards' }));
+        }
+
+        // 0.26 Start Free / Explore Assistant: lift 10px
+        if (ctaEl) {
+          s1Animations.push(ctaEl.animate([
+            { opacity: 0, transform: 'translateY(' + (10 * D) + 'px)' },
+            { opacity: 1, transform: 'translateY(0)' }
+          ], { duration: 500, delay: 260, easing: LIFT, fill: 'forwards' }));
+        }
+
+        // 0.20 / 0.29 headline lines: masked reveal
+        h1Lines.forEach(function(line, idx) {
+          s1Animations.push(line.animate([
+            { opacity: 0, transform: 'translateY(108%)', offset: 0 },
+            { opacity: 1, offset: 0.14 },
+            { opacity: 1, transform: 'translateY(0)', offset: 1 }
+          ], { duration: 950, delay: 200 + (idx * 90), easing: REVEAL, fill: 'forwards' }));
+        });
+
+        // 0.52 subtitle: lift 14px, dur 0.65
+        if (subtitleEl) {
+          s1Animations.push(subtitleEl.animate([
+            { opacity: 0, transform: 'translateY(' + (14 * D) + 'px)' },
+            { opacity: 1, transform: 'translateY(0)' }
+          ], { duration: 650, delay: 520, easing: LIFT, fill: 'forwards' }));
+        }
+
+        // 0.64 composer-shell: opacity 0→1, translateY(22*D) + scale(0.985)→1, dur 0.95, REVEAL
+        if (composerShell) {
+          s1Animations.push(composerShell.animate([
+            { opacity: 0, transform: 'translateY(' + (22 * D) + 'px) scale(0.985)' },
+            { opacity: 1, transform: 'translateY(0) scale(1)' }
+          ], { duration: 950, delay: 640, easing: REVEAL, fill: 'forwards' }));
+        }
+
+        // 0.78 placeholder: lift 10px, dur 0.55
+        if (composerPlaceholder) {
+          s1Animations.push(composerPlaceholder.animate([
+            { opacity: 0, transform: 'translateY(' + (10 * D) + 'px)' },
+            { opacity: 1, transform: 'translateY(0)' }
+          ], { duration: 550, delay: 780, easing: LIFT, fill: 'forwards' }));
+        }
+
+        // 0.84+ control buttons: lift 10px, stagger 0.055
+        ctrlButtons.forEach(function(btn, idx) {
+          if (btn) {
+            s1Animations.push(btn.animate([
+              { opacity: 0, transform: 'translateY(' + (10 * D) + 'px)' },
+              { opacity: 1, transform: 'translateY(0)' }
+            ], { duration: 500, delay: 840 + (idx * 55), easing: LIFT, fill: 'forwards' }));
+          }
+        });
+
+        // 0.94 composer-glow: clipPath inset(0 40% 0 40%) → inset(0 0% 0 0%), opacity→0.95, dur 0.80, REVEAL
+        if (composerGlow) {
+          s1Animations.push(composerGlow.animate([
+            { clipPath: 'inset(0 40% 0 40%)', opacity: 0 },
+            { clipPath: 'inset(0 0% 0 0%)', opacity: 0.95 }
+          ], { duration: 800, delay: 940, easing: REVEAL, fill: 'forwards' }));
+        }
+
+        // 1.08 trust brands: lift 12px, stagger 0.06
+        trustBrands.forEach(function(brand, idx) {
+          s1Animations.push(brand.animate([
+            { opacity: 0, transform: 'translateY(' + (12 * D) + 'px)' },
+            { opacity: 1, transform: 'translateY(0)' }
+          ], { duration: 500, delay: 1080 + (idx * 60), easing: LIFT, fill: 'forwards' }));
+        });
+
+        // Master completion teardown at ~1.8s
+        setTimeout(function() {
+          document.documentElement.classList.remove('entrance');
+          document.documentElement.classList.add('hero-ready');
+          s1Animations.forEach(function(anim) {
+            try {
+              if (anim.commitStyles) anim.commitStyles();
+              anim.cancel();
+            } catch(e) {
+              anim.cancel();
+            }
+          });
+        }, 1800);
+      }
+
+      /* Wait for document.fonts.ready OR 400ms max before starting Section 1 timeline */
+      var fontPromise = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+      var timeoutPromise = new Promise(function(resolve) { setTimeout(resolve, 400); });
+      Promise.race([fontPromise, timeoutPromise]).then(startSection1Timeline);
+
+      /* 4. Section 2 Entrance Timeline */
+      var s2Animations = [];
+
+      function startSection2Timeline() {
+        var h2Lines = document.querySelectorAll('.section-two .hl-line');
+        var subheadEl = document.getElementById('featuresSubhead');
+        var panelEl = document.getElementById('featuresPanel');
+        var reasoningEl = document.getElementById('reasoningRow');
+        var chatCardEl = document.getElementById('chatCard');
+        var messages = document.querySelectorAll('.chat-card .chat-msg');
+        var inputBar = document.getElementById('chatInputBar');
+
+        // 0.00 / 0.09 two h2 lines: masked reveal
+        h2Lines.forEach(function(line, idx) {
+          s2Animations.push(line.animate([
+            { opacity: 0, transform: 'translateY(108%)', offset: 0 },
+            { opacity: 1, offset: 0.14 },
+            { opacity: 1, transform: 'translateY(0)', offset: 1 }
+          ], { duration: 950, delay: idx * 90, easing: REVEAL, fill: 'forwards' }));
+        });
+
+        // 0.30 subhead: lift 14px, dur 0.65
+        if (subheadEl) {
+          s2Animations.push(subheadEl.animate([
+            { opacity: 0, transform: 'translateY(' + (14 * D) + 'px)' },
+            { opacity: 1, transform: 'translateY(0)' }
+          ], { duration: 650, delay: 300, easing: LIFT, fill: 'forwards' }));
+        }
+
+        // 0.40 panel: translateY(26*D)+scale(0.985)→identity, opacity 0→1, dur 1.00, REVEAL
+        if (panelEl) {
+          s2Animations.push(panelEl.animate([
+            { opacity: 0, transform: 'translateY(' + (26 * D) + 'px) scale(0.985)' },
+            { opacity: 1, transform: 'translateY(0) scale(1)' }
+          ], { duration: 1000, delay: 400, easing: REVEAL, fill: 'forwards' }));
+        }
+
+        // 0.68 Live reasoning: lift 10px
+        if (reasoningEl) {
+          s2Animations.push(reasoningEl.animate([
+            { opacity: 0, transform: 'translateY(' + (10 * D) + 'px)' },
+            { opacity: 1, transform: 'translateY(0)' }
+          ], { duration: 500, delay: 680, easing: LIFT, fill: 'forwards' }));
+        }
+
+        // 0.72 chat card: translateY(18*D)→0 ONLY (no opacity — inherits panel fade), dur 0.85
+        if (chatCardEl) {
+          s2Animations.push(chatCardEl.animate([
+            { transform: 'translateY(' + (18 * D) + 'px)' },
+            { transform: 'translateY(0)' }
+          ], { duration: 850, delay: 720, easing: REVEAL, fill: 'forwards' }));
+        }
+
+        // 0.88+ messages: lift 10px stagger 0.065
+        messages.forEach(function(msg, idx) {
+          s2Animations.push(msg.animate([
+            { opacity: 0, transform: 'translateY(' + (10 * D) + 'px)' },
+            { opacity: 1, transform: 'translateY(0)' }
+          ], { duration: 500, delay: 880 + (idx * 65), easing: LIFT, fill: 'forwards' }));
+        });
+
+        // 1.24 inputbar: lift 10px
+        if (inputBar) {
+          s2Animations.push(inputBar.animate([
+            { opacity: 0, transform: 'translateY(' + (10 * D) + 'px)' },
+            { opacity: 1, transform: 'translateY(0)' }
+          ], { duration: 500, delay: 1240, easing: LIFT, fill: 'forwards' }));
+        }
+
+        // 1.30 gooey demo card: lift 12px
+        var gooeyWrap = document.getElementById('gooeyDemoWrap');
+        if (gooeyWrap) {
+          s2Animations.push(gooeyWrap.animate([
+            { opacity: 0, transform: 'translateY(' + (12 * D) + 'px)' },
+            { opacity: 1, transform: 'translateY(0)' }
+          ], { duration: 600, delay: 1300, easing: LIFT, fill: 'forwards' }));
+        }
+
+        // Complete Section 2 entrance teardown
+        setTimeout(function() {
+          document.documentElement.classList.remove('entrance-s2');
+          s2Animations.forEach(function(anim) {
+            try {
+              if (anim.commitStyles) anim.commitStyles();
+              anim.cancel();
+            } catch(e) {
+              anim.cancel();
+            }
+          });
+        }, 1800);
+      }
+
+      var s2Section = document.getElementById('features');
+      if (s2Section && 'IntersectionObserver' in window) {
+        var s2Observer = new IntersectionObserver(function(entries, observer) {
+          entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+              observer.disconnect();
+              startSection2Timeline();
+            }
+          });
+        }, {
+          rootMargin: '0px 0px -20% 0px',
+          threshold: 0
+        });
+        s2Observer.observe(s2Section);
+      } else {
+        startSection2Timeline();
+      }
+
+    })();
+  </script>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       REACT & GOOEY INPUT INTEGRATION
+       ══════════════════════════════════════════════════════════════════ -->
+  <script>
+    (function() {
+      'use strict';
+
+      var mountPoint = document.getElementById('gooey-input-demo-root');
+      if (!mountPoint) return;
+
+      var filterId = 'gooey-filter-demo';
+
+      // SVG Filter definition for liquid gooey effect
+      function renderFilterDefs() {
+        if (document.getElementById(filterId)) return;
+        var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('class', 'absolute hidden h-0 w-0');
+        svg.setAttribute('aria-hidden', 'true');
+        svg.style.position = 'absolute';
+        svg.style.width = '0';
+        svg.style.height = '0';
+        svg.style.overflow = 'hidden';
+        svg.style.pointerEvents = 'none';
+
+        var defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        var filter = document.createElementNS('http://www.w3.org/2000/svg', 'filter');
+        filter.setAttribute('id', filterId);
+        filter.setAttribute('x', '-50%');
+        filter.setAttribute('y', '-50%');
+        filter.setAttribute('width', '200%');
+        filter.setAttribute('height', '200%');
+
+        var feBlur = document.createElementNS('http://www.w3.org/2000/svg', 'feGaussianBlur');
+        feBlur.setAttribute('in', 'SourceGraphic');
+        feBlur.setAttribute('stdDeviation', '5');
+        feBlur.setAttribute('result', 'blur');
+
+        var feColorMatrix = document.createElementNS('http://www.w3.org/2000/svg', 'feColorMatrix');
+        feColorMatrix.setAttribute('in', 'blur');
+        feColorMatrix.setAttribute('type', 'matrix');
+        feColorMatrix.setAttribute('values', '1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -10');
+        feColorMatrix.setAttribute('result', 'goo');
+
+        var feComposite = document.createElementNS('http://www.w3.org/2000/svg', 'feComposite');
+        feComposite.setAttribute('in', 'SourceGraphic');
+        feComposite.setAttribute('in2', 'goo');
+        feComposite.setAttribute('operator', 'atop');
+
+        filter.appendChild(feBlur);
+        filter.appendChild(feColorMatrix);
+        filter.appendChild(feComposite);
+        defs.appendChild(filter);
+        svg.appendChild(defs);
+        document.body.appendChild(svg);
+      }
+
+      renderFilterDefs();
+
+      // Check if React 18 is available and mount via React
+      function tryReactMount() {
+        if (!window.React || !window.ReactDOM) return false;
+        var React = window.React;
+        var ReactDOM = window.ReactDOM;
+
+        function SearchIcon() {
+          return React.createElement(
+            'svg',
+            {
+              viewBox: '0 0 24 24',
+              fill: 'none',
+              stroke: 'currentColor',
+              strokeLinecap: 'round',
+              strokeLinejoin: 'round',
+              strokeWidth: 2,
+              className: 'size-4 shrink-0',
+              style: { width: '16px', height: '16px', flexShrink: 0 }
+            },
+            React.createElement('circle', { cx: 11, cy: 11, r: 8 }),
+            React.createElement('path', { d: 'm21 21-4.3-4.3' })
+          );
+        }
+
+        function GooeyFilter(props) {
+          return React.createElement(
+            'svg',
+            {
+              className: 'absolute hidden h-0 w-0',
+              'aria-hidden': true,
+              style: { position: 'absolute', width: 0, height: 0, overflow: 'hidden', pointerEvents: 'none' }
+            },
+            React.createElement(
+              'defs',
+              null,
+              React.createElement(
+                'filter',
+                { id: props.filterId, x: '-50%', y: '-50%', width: '200%', height: '200%' },
+                React.createElement('feGaussianBlur', { in: 'SourceGraphic', stdDeviation: props.blur, result: 'blur' }),
+                React.createElement('feColorMatrix', { in: 'blur', type: 'matrix', values: '1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -10', result: 'goo' }),
+                React.createElement('feComposite', { in: 'SourceGraphic', in2: 'goo', operator: 'atop' })
+              )
+            )
+          );
+        }
+
+        function GooeyInput(props) {
+          var placeholder = props.placeholder || 'Type to search...';
+          var collapsedWidth = props.collapsedWidth || 115;
+          var expandedWidth = props.expandedWidth || 200;
+          var expandedOffset = props.expandedOffset || 50;
+          var gooeyBlur = props.gooeyBlur || 5;
+
+          var idState = React.useState(function() {
+            return 'gooey-filter-' + Math.random().toString(36).slice(2, 9);
+          });
+          var currentFilterId = idState[0];
+
+          var expandedState = React.useState(false);
+          var isExpanded = expandedState[0];
+          var setIsExpanded = expandedState[1];
+
+          var textState = React.useState(props.defaultValue || '');
+          var searchText = props.value !== undefined ? props.value : textState[0];
+          var setSearchText = textState[1];
+
+          var inputRef = React.useRef(null);
+
+          React.useEffect(function() {
+            if (isExpanded && inputRef.current) {
+              inputRef.current.focus();
+            } else if (!isExpanded) {
+              if (props.value === undefined) setSearchText('');
+            }
+          }, [isExpanded]);
+
+          var handleExpand = function() {
+            if (!props.disabled) {
+              setIsExpanded(true);
+              if (props.onOpenChange) props.onOpenChange(true);
+            }
+          };
+
+          var handleChange = function(e) {
+            var val = e.target.value;
+            if (props.value === undefined) setSearchText(val);
+            if (props.onValueChange) props.onValueChange(val);
+          };
+
+          var handleBlur = function() {
+            if (!searchText) {
+              setIsExpanded(false);
+              if (props.onOpenChange) props.onOpenChange(false);
+            }
+          };
+
+          var surfaceClass = 'bg-foreground text-background shadow-sm ring-1 ring-border/60';
+
+          return React.createElement(
+            'div',
+            { className: 'relative flex items-center justify-center ' + (props.className || '') },
+            React.createElement(GooeyFilter, { filterId: currentFilterId, blur: gooeyBlur }),
+            React.createElement(
+              'div',
+              {
+                className: 'relative flex h-10 items-center justify-center',
+                style: { filter: 'url(#' + currentFilterId + ')' }
+              },
+              React.createElement(
+                'div',
+                {
+                  className: 'flex h-10 items-center justify-center gooey-button-row',
+                  style: {
+                    width: (isExpanded ? expandedWidth : collapsedWidth) + 'px',
+                    marginLeft: (isExpanded ? expandedOffset : 0) + 'px'
+                  }
+                },
+                React.createElement(
+                  'button',
+                  {
+                    type: 'button',
+                    disabled: props.disabled,
+                    onClick: handleExpand,
+                    className: 'flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-full px-4 text-sm font-medium outline-none ' + surfaceClass
+                  },
+                  !isExpanded ? React.createElement(SearchIcon, null) : null,
+                  React.createElement('input', {
+                    ref: inputRef,
+                    type: 'search',
+                    enterKeyHint: 'search',
+                    autoComplete: 'off',
+                    value: searchText,
+                    onChange: handleChange,
+                    onBlur: handleBlur,
+                    disabled: props.disabled || !isExpanded,
+                    placeholder: placeholder,
+                    className: 'h-full min-w-0 flex-1 bg-transparent text-sm text-background outline-none gooey-input-el ' + (isExpanded ? '' : 'pointer-events-none')
+                  })
+                )
+              ),
+              React.createElement(
+                'div',
+                {
+                  className: 'absolute top-1/2 left-0 flex size-10 -translate-y-1/2 items-center justify-center gooey-bubble-anim ' + (isExpanded ? 'is-expanded' : '')
+                },
+                React.createElement(
+                  'div',
+                  { className: 'flex size-10 items-center justify-center rounded-full ' + surfaceClass },
+                  React.createElement(SearchIcon, null)
+                )
+              )
+            )
+          );
+        }
+
+        // The user's GooeyInputDemo component code
+        function GooeyInputDemo() {
+          return React.createElement(
+            'div',
+            { className: 'flex h-40 w-full items-center justify-center' },
+            React.createElement(GooeyInput, { placeholder: 'Search...' })
+          );
+        }
+
+        window.GooeyInput = GooeyInput;
+        window.GooeyInputDemo = GooeyInputDemo;
+
+        var root = ReactDOM.createRoot(mountPoint);
+        root.render(React.createElement(GooeyInputDemo, null));
+        return true;
+      }
+
+      // Standalone mounting fallback ensuring immediate interactive rendering under any environment
+      function renderStandaloneMount() {
+        mountPoint.innerHTML = '';
+
+        var demoContainer = document.createElement('div');
+        demoContainer.className = 'flex h-40 w-full items-center justify-center';
+
+        var root = document.createElement('div');
+        root.className = 'relative flex items-center justify-center';
+
+        var filterWrap = document.createElement('div');
+        filterWrap.className = 'relative flex h-10 items-center justify-center';
+        filterWrap.style.filter = 'url(#' + filterId + ')';
+
+        var buttonRow = document.createElement('div');
+        buttonRow.className = 'flex h-10 items-center justify-center gooey-button-row';
+        buttonRow.style.width = '115px';
+        buttonRow.style.marginLeft = '0px';
+
+        var surfaceClass = 'bg-foreground text-background shadow-sm ring-1 ring-border/60';
+
+        var triggerBtn = document.createElement('button');
+        triggerBtn.type = 'button';
+        triggerBtn.className = 'flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-full px-4 text-sm font-medium outline-none ' + surfaceClass;
+
+        var searchIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        searchIcon.setAttribute('viewBox', '0 0 24 24');
+        searchIcon.setAttribute('fill', 'none');
+        searchIcon.setAttribute('stroke', 'currentColor');
+        searchIcon.setAttribute('stroke-linecap', 'round');
+        searchIcon.setAttribute('stroke-linejoin', 'round');
+        searchIcon.setAttribute('stroke-width', '2');
+        searchIcon.setAttribute('class', 'size-4 shrink-0');
+        searchIcon.style.width = '16px';
+        searchIcon.style.height = '16px';
+        searchIcon.style.flexShrink = '0';
+        searchIcon.innerHTML = '<circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path>';
+
+        var inputEl = document.createElement('input');
+        inputEl.type = 'search';
+        inputEl.enterKeyHint = 'search';
+        inputEl.autocomplete = 'off';
+        inputEl.placeholder = 'Search...';
+        inputEl.className = 'h-full min-w-0 flex-1 bg-transparent text-sm text-background outline-none gooey-input-el pointer-events-none';
+
+        triggerBtn.appendChild(searchIcon);
+        triggerBtn.appendChild(inputEl);
+        buttonRow.appendChild(triggerBtn);
+
+        var bubbleEl = document.createElement('div');
+        bubbleEl.className = 'absolute top-1/2 left-0 flex size-10 -translate-y-1/2 items-center justify-center gooey-bubble-anim';
+
+        var bubbleSurface = document.createElement('div');
+        bubbleSurface.className = 'flex size-10 items-center justify-center rounded-full ' + surfaceClass;
+        var bubbleIcon = searchIcon.cloneNode(true);
+        bubbleSurface.appendChild(bubbleIcon);
+        bubbleEl.appendChild(bubbleSurface);
+
+        filterWrap.appendChild(buttonRow);
+        filterWrap.appendChild(bubbleEl);
+        root.appendChild(filterWrap);
+        demoContainer.appendChild(root);
+        mountPoint.appendChild(demoContainer);
+
+        var isExpanded = false;
+
+        function expand() {
+          if (isExpanded) return;
+          isExpanded = true;
+          buttonRow.style.width = '200px';
+          buttonRow.style.marginLeft = '50px';
+          bubbleEl.classList.add('is-expanded');
+          searchIcon.style.display = 'none';
+          inputEl.classList.remove('pointer-events-none');
+          inputEl.focus();
+        }
+
+        function collapse() {
+          if (!isExpanded) return;
+          if (inputEl.value.trim() !== '') return;
+          isExpanded = false;
+          buttonRow.style.width = '115px';
+          buttonRow.style.marginLeft = '0px';
+          bubbleEl.classList.remove('is-expanded');
+          searchIcon.style.display = '';
+          inputEl.classList.add('pointer-events-none');
+          inputEl.value = '';
+        }
+
+        triggerBtn.addEventListener('click', expand);
+        inputEl.addEventListener('blur', function() {
+          setTimeout(collapse, 150);
+        });
+      }
+
+      // Try React mounting first, otherwise fallback to immediate standalone rendering
+      if (!tryReactMount()) {
+        renderStandaloneMount();
+        // If React loads asynchronously via CDN, upgrade to React component
+        window.addEventListener('load', function() {
+          if (window.React && window.ReactDOM && !window.GooeyInputDemo) {
+            tryReactMount();
+          }
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

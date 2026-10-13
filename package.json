@@ -1,0 +1,20 @@
+{
+  "name": "psra-ai-chatbot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PSRA AI Chatbot frontend and components",
+  "scripts": {
+    "dev": "python3 -m http.server 8088 --directory frontend-prototype"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "motion": "^12.4.7",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^3.0.2"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5"
+  }
+}
